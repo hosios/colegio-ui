@@ -8,8 +8,8 @@ Este repositorio es público. No incluya datos de estudiantes, tokens ni direcci
 
 ```html
 <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SU_USUARIO/colegio-ui@1/colegio-ui.css">
-<script src="https://cdn.jsdelivr.net/gh/SU_USUARIO/colegio-ui@1/colegio-ui.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hosios/colegio-ui@1/colegio-ui.css">
+<script src="https://cdn.jsdelivr.net/gh/hosios/colegio-ui@1/colegio-ui.js"></script>
 ```
 
 Con `@1`, el widget recibe automáticamente todas las versiones 1.x. Una versión 2.0.0 solo se aplica cuando el widget cambia a `@2`.
