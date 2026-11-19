@@ -1,5 +1,5 @@
 /* ============================================================================
-   COLEGIO-UI 1.1.0 — Biblioteca compartida de los widgets de Grist
+   COLEGIO-UI 1.1.1 — Biblioteca compartida de los widgets de Grist
    ----------------------------------------------------------------------------
    Uso básico:
      const ui = ColegioUI.iniciar({
@@ -19,7 +19,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "1.1.0";
+  const VERSION = "1.1.1";
 
   /* ==========================================================================
      UTILIDADES
@@ -59,8 +59,23 @@
     return m ? Number(m[1]) : 0;
   };
 
-  /** Indica si una referencia está vacía (Grist envía 0 para una referencia vacía). */
-  util.sinRef = v => util.idRef(v) === 0;
+  /**
+   * Indica si una referencia está vacía. Vacías: null, "", 0, "0", "Tabla[0]",
+   * ["R", tabla, 0], { rowId: 0 } y listas de referencias sin elementos (["L"]).
+   * Un texto que no es un id (por ejemplo, la columna a mostrar «Educación Artística»)
+   * cuenta como referencia con valor.
+   */
+  util.sinRef = v => {
+    if (v === null || v === undefined) return true;
+    if (Array.isArray(v)) return v[0] === "L" ? v.length <= 1 : util.idRef(v) === 0;
+    if (typeof v === "string") {
+      const t = v.trim();
+      if (t === "") return true;
+      if (/^\d+$/.test(t) || /\[\d+\]$/.test(t)) return util.idRef(t) === 0;
+      return false;
+    }
+    return util.idRef(v) === 0;
+  };
 
   /** Convierte datos por columnas (fetchTable) en una lista de filas. */
   util.filas = datos => {
