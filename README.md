@@ -14,6 +14,22 @@ Este repositorio es público. No incluya datos de estudiantes, tokens ni direcci
 
 Con `@1`, el widget recibe automáticamente todas las versiones 1.x. Una versión 2.0.0 solo se aplica cuando el widget cambia a `@2`.
 
+### Verificar que la biblioteca cargó
+
+Coloque estas líneas al comienzo del JavaScript del widget. Indique en `requiere` la versión mínima que usa el widget:
+
+```js
+if (!window.ColegioUI) {
+  document.body.insertAdjacentHTML("afterbegin",
+    '<p style="margin:12px;padding:10px 14px;border:1px solid #b3261e;color:#b3261e;background:#fbe9e7">' +
+    'No se pudo cargar la biblioteca colegio-ui.js. Revise la dirección del script en el HTML.</p>');
+  throw new Error("colegio-ui.js no se cargó");
+}
+ColegioUI.requiere("1.1");   // versión 1.x, al menos 1.1
+```
+
+`requiere` muestra un aviso en pantalla y detiene el widget si la versión cargada no es compatible.
+
 ## Iniciar la barra superior
 
 ```js
@@ -53,11 +69,16 @@ Todos los filtros aceptan `id`, `etiqueta`, `valor` (inicial), `recordar` (guard
 | `segmentado` | `opciones` | `opciones(lista)`, `ocultarOpcion(valor, ocultar)` |
 | `personalizado` | `elemento` (nodo o HTML) | |
 
-Cada filtro expone `valor` (lectura y escritura), `mostrar(visible)` y `elemento`.
+Cada filtro expone `valor` (lectura y escritura), `fijar(valor, { avisar })`, `mostrar(visible)` y `elemento`.
+
+- Asignar `valor` cambia el filtro sin llamar a `alCambiar`. Si el filtro tiene `recordar: true`, también guarda la preferencia.
+- `fijar(valor)` cambia el filtro, guarda la preferencia y llama a `alCambiar`. Con `{ avisar: false }`, no llama a `alCambiar`.
+- `ocultarOpcion(valor, ocultar, { avisar })` del filtro segmentado: si oculta la opción activa, pasa a la primera opción visible, la guarda y llama a `alCambiar` (salvo `{ avisar: false }`).
 
 ```js
 ui.filtros.curso.opciones(["6.º grado", "7.º grado"]);
 ui.filtros.vista.ocultarOpcion("docente", !mapeo.Docente);
+ui.filtros.vista.fijar("materia");          // por ejemplo, al hacer clic en un encabezado
 ui.filtros.sinPadres.mostrar(!!mapeo.TipoCarga);
 ```
 
@@ -68,9 +89,10 @@ ui.filtros.sinPadres.mostrar(!!mapeo.TipoCarga);
 | `esc(texto)` | Escapa texto para HTML |
 | `coll`, `comparar(a, b)` | Orden alfabético en español con números naturales |
 | `texto(v)`, `vacio(v)`, `numOrden(v)` | Lectura de valores de Grist |
-| `idRef(v)` | Id de una referencia en cualquier formato |
+| `idRef(v)`, `sinRef(v)` | Id de una referencia en cualquier formato; `sinRef` indica si está vacía (0, nula o vacía) |
 | `filas(datos)`, `leerTabla(nombre)` | Datos por columnas → lista de filas |
-| `fecha(v)`, `cedula(v)`, `numero(v, decimales)` | Formatos locales |
+| `fecha(v)`, `cedula(v)`, `numero(v, decimales)` | Formatos locales (`fecha` usa UTC: sirve para fechas guardadas, como nacimientos) |
+| `hoy(opciones)` | Fecha de hoy en la hora local: «19/11/2026», o «19 de noviembre de 2026» con `{ day: "numeric", month: "long", year: "numeric" }` |
 | `foto(fuente, nombre)`, `htmlFoto(fuente, nombre, tamaño, alt)`, `FOTO_VACIA` | Fotos de Nextcloud con reemplazo |
 | `celdaNota(v, resaltar, tipo)` | Nota con insignia (por defecto, resalta el 1) |
 | `plural(n, singular, plural)` | «3 estudiantes» |
@@ -97,6 +119,11 @@ Otras funciones: `ColegioUI.cargando(titulo, detalle)` devuelve una función que
 | `cu-zoom`, `cu-no-imprimir` | Zoom de pantalla y elementos que no se imprimen |
 
 Variables principales: `--cu-tinta`, `--cu-suave`, `--cu-linea`, `--cu-banda`, `--cu-marino`, `--cu-marino-claro`, `--cu-acento`, `--cu-alerta`, `--cu-exito` y `--cu-fuente`.
+
+## Historial
+
+- **1.1.0**: `fijar()` en los filtros; el setter `valor` guarda la preferencia; `ocultarOpcion` avisa el cambio; `util.hoy()`, `util.sinRef()` y `ColegioUI.requiere()`.
+- **1.0.0**: versión inicial.
 
 ## Versiones
 
