@@ -1,0 +1,225 @@
+/* ============================================================================
+   COLEGIO-UI 1.0.0 — Hoja de estilos compartida de los widgets de Grist
+   ----------------------------------------------------------------------------
+   - Paleta azul marino (Libretas / Notas 1), tipografía Source Sans 3
+   - Barra superior común: filtros, zoom, escala de grises, acciones, imprimir
+   - Componentes: títulos, resumen, grupos, tablas, insignias, mensajes, fotos
+   - Impresión en tamaño carta (el tamaño se ajusta desde colegio-ui.js)
+   Todas las clases llevan el prefijo «cu-» para no chocar con el CSS propio
+   de cada widget. Este archivo no contiene datos ni direcciones del Colegio.
+   ============================================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap");
+
+/* ---------------------------------------------------------------------------
+   1. VARIABLES (cada widget puede redefinir --cu-acento)
+   --------------------------------------------------------------------------- */
+:root {
+  --cu-tinta: #1f2d3d;        /* texto principal y bordes fuertes */
+  --cu-suave: #5b6b7c;        /* texto secundario y etiquetas */
+  --cu-tenue: #a3afbb;        /* valores vacíos */
+  --cu-linea: #d7dee6;        /* líneas de tabla y bordes de controles */
+  --cu-linea-fuerte: #b9c4d0; /* separación entre bloques de filas */
+  --cu-fondo: #ffffff;
+  --cu-banda: #f3f6f9;        /* encabezados de tabla */
+  --cu-resalte: #f8fafc;      /* fila bajo el cursor */
+
+  --cu-marino: #214478;       /* color institucional */
+  --cu-marino-oscuro: #1a365f;
+  --cu-marino-claro: #b0c0e4;
+  --cu-acento: var(--cu-marino);
+
+  --cu-alerta: #b3261e;
+  --cu-alerta-fondo: #fbe9e7;
+  --cu-exito: #27675b;
+  --cu-exito-fondo: #e3f1ee;
+
+  --cu-fuente: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+  --cu-radio: 4px;
+  --cu-zoom: 1;               /* lo ajusta colegio-ui.js */
+}
+
+/* ---------------------------------------------------------------------------
+   2. BASE
+   --------------------------------------------------------------------------- */
+html, body { margin: 0; background: var(--cu-fondo); color: var(--cu-tinta); }
+body.cu { font: 14px/1.4 var(--cu-fuente); }
+body.cu *, body.cu *::before, body.cu *::after { box-sizing: border-box; }
+
+body.cu [hidden] { display: none !important; }
+.cu-zoom { zoom: var(--cu-zoom); }
+.cu-pagina { padding: 14px 18px 24px; }
+html.cu-gris .cu-contenido { filter: grayscale(1); }
+
+/* ---------------------------------------------------------------------------
+   3. CONTROLES (botones, listas, casillas, búsqueda)
+   --------------------------------------------------------------------------- */
+.cu-boton, .cu-select, .cu-busqueda {
+  font: inherit; color: var(--cu-tinta); background: var(--cu-fondo);
+  border: 1px solid var(--cu-linea); border-radius: var(--cu-radio);
+  padding: 5px 9px; min-height: 32px;
+}
+.cu-boton { cursor: pointer; white-space: nowrap; }
+.cu-boton:hover, .cu-select:hover, .cu-busqueda:hover { border-color: var(--cu-acento); }
+.cu-boton:focus-visible, .cu-select:focus-visible, .cu-busqueda:focus-visible,
+.cu-check input:focus-visible { outline: 2px solid var(--cu-acento); outline-offset: 1px; }
+.cu-boton[disabled] { opacity: .5; cursor: default; }
+
+.cu-boton--primario {
+  background: var(--cu-acento); border-color: var(--cu-acento);
+  color: #fff; font-weight: 600;
+}
+.cu-boton--primario:hover { background: var(--cu-marino-oscuro); border-color: var(--cu-marino-oscuro); }
+.cu-boton--activo { background: var(--cu-tinta); border-color: var(--cu-tinta); color: #fff; }
+
+.cu-busqueda { min-width: 180px; }
+.cu-check { display: flex; align-items: center; gap: 6px; min-height: 32px; cursor: pointer; }
+.cu-check input { margin: 0; accent-color: var(--cu-acento); }
+
+/* Grupo de botones unidos («Ver por», etc.) */
+.cu-segmentado { display: flex; }
+.cu-segmentado .cu-boton { border-radius: 0; margin-left: -1px; }
+.cu-segmentado .cu-boton:first-child { margin-left: 0; }
+.cu-segmentado .cu-boton.cu-primero { border-top-left-radius: var(--cu-radio); border-bottom-left-radius: var(--cu-radio); }
+.cu-segmentado .cu-boton.cu-ultimo { border-top-right-radius: var(--cu-radio); border-bottom-right-radius: var(--cu-radio); }
+.cu-segmentado .cu-boton--activo { position: relative; }
+
+/* ---------------------------------------------------------------------------
+   4. BARRA SUPERIOR
+   --------------------------------------------------------------------------- */
+.cu-barra {
+  position: sticky; top: 0; z-index: 9999;
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 14px;
+  padding: 10px 18px 12px;
+  background: var(--cu-fondo);
+  border-bottom: 2px solid var(--cu-tinta);
+  font: 14px/1.4 var(--cu-fuente);
+}
+.cu-filtros, .cu-herramientas { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 14px; }
+.cu-herramientas { margin-left: auto; }
+
+.cu-campo { display: flex; flex-direction: column; gap: 3px; }
+.cu-campo > .cu-etiqueta { font-size: 12px; color: var(--cu-suave); }
+
+.cu-zoom-grupo { display: flex; gap: 4px; align-items: center; }
+.cu-zoom-grupo output {
+  min-width: 46px; text-align: center; color: var(--cu-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------
+   5. ENCABEZADO Y RESUMEN
+   --------------------------------------------------------------------------- */
+.cu-titulo { font-size: 22px; font-weight: 700; margin: 0 0 2px; letter-spacing: -0.01em; }
+.cu-subtitulo { color: var(--cu-suave); margin: 0 0 14px; }
+
+.cu-resumen { display: flex; flex-wrap: wrap; gap: 24px; margin: 0 0 16px; }
+.cu-resumen b { display: block; font-size: 26px; font-weight: 700; line-height: 1.1; color: var(--cu-acento); }
+.cu-resumen span { font-size: 13px; color: var(--cu-suave); }
+.cu-resumen .cu-alerta b { color: var(--cu-alerta); }
+
+/* ---------------------------------------------------------------------------
+   6. GRUPOS (por curso, docente, materia…)
+   --------------------------------------------------------------------------- */
+.cu-grupo { margin-bottom: 20px; }
+.cu-grupo > h2 {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  margin: 0 0 6px; padding-left: 8px;
+  font-size: 16px; font-weight: 700;
+  border-left: 4px solid var(--cu-acento);
+}
+.cu-grupo > h2 small { font-size: 13px; font-weight: 400; color: var(--cu-suave); }
+
+/* ---------------------------------------------------------------------------
+   7. TABLAS
+   --------------------------------------------------------------------------- */
+.cu-tabla { width: 100%; border-collapse: collapse; }
+.cu-tabla th, .cu-tabla td {
+  padding: 5px 10px; text-align: left; vertical-align: middle;
+  border-bottom: 1px solid var(--cu-linea);
+}
+.cu-tabla th { font-size: 12px; font-weight: 600; color: var(--cu-suave); background: var(--cu-banda); }
+.cu-tabla tbody tr:hover td { background: var(--cu-resalte); }
+.cu-tabla tr.cu-inicio td { border-top: 1px solid var(--cu-linea-fuerte); }
+.cu-tabla .cu-num { width: 34px; text-align: right; color: var(--cu-suave); }
+.cu-tabla .cu-centro { text-align: center; }
+.cu-tabla .cu-nota { width: 70px; text-align: center; font-variant-numeric: tabular-nums; }
+.cu-tabla .cu-fuerte { font-weight: 600; }
+
+/* Encabezado de columna que cambia el orden o la vista */
+.cu-tabla th button.cu-orden {
+  all: unset; cursor: pointer; font: inherit; color: var(--cu-suave);
+  border-bottom: 1px dotted currentColor;
+}
+.cu-tabla th button.cu-orden:hover { color: var(--cu-acento); }
+.cu-tabla th button.cu-orden.cu-activo { color: var(--cu-tinta); font-weight: 700; border-bottom: 0; }
+.cu-tabla th button.cu-orden:focus-visible { outline: 2px solid var(--cu-acento); outline-offset: 2px; }
+
+/* ---------------------------------------------------------------------------
+   8. INSIGNIAS, VALORES Y NOTAS SECUNDARIAS
+   --------------------------------------------------------------------------- */
+.cu-insignia {
+  display: inline-block; min-width: 26px; padding: 1px 6px; border-radius: 3px;
+  text-align: center; font-weight: 700;
+  background: var(--cu-banda); color: var(--cu-tinta);
+}
+.cu-insignia--alerta { background: var(--cu-alerta-fondo); color: var(--cu-alerta); }
+.cu-insignia--exito { background: var(--cu-exito-fondo); color: var(--cu-exito); }
+.cu-insignia--acento { background: var(--cu-acento); color: #fff; }
+.cu-vacio { color: var(--cu-tenue); }
+.cu-detalle { display: block; font-size: 12px; color: var(--cu-suave); }
+.cu-detalle--alerta { color: var(--cu-alerta); font-style: italic; }
+
+/* ---------------------------------------------------------------------------
+   9. MENSAJES
+   --------------------------------------------------------------------------- */
+.cu-mensaje {
+  padding: 18px; border: 1px dashed var(--cu-linea); border-radius: 6px;
+  color: var(--cu-suave);
+}
+.cu-mensaje--alerta {
+  padding: 10px 14px; margin-bottom: 14px;
+  border-color: var(--cu-alerta); color: var(--cu-alerta); background: var(--cu-alerta-fondo);
+}
+
+.cu-cargando {
+  position: fixed; inset: 0; z-index: 10000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  background: rgba(255, 255, 255, .95); font-family: var(--cu-fuente);
+}
+.cu-cargando b { font-size: 20px; color: var(--cu-tinta); }
+.cu-cargando span { color: var(--cu-suave); }
+
+/* ---------------------------------------------------------------------------
+   10. FOTOS
+   --------------------------------------------------------------------------- */
+.cu-foto {
+  display: block; object-fit: cover; background: var(--cu-banda);
+  border: 1px solid var(--cu-linea); border-radius: 3px;
+}
+.cu-foto--chica { width: 40px; height: 50px; }
+.cu-foto--mediana { width: 80px; height: 100px; }
+.cu-foto--grande { width: 120px; height: 150px; }
+
+/* ---------------------------------------------------------------------------
+   11. IMPRESIÓN (el tamaño de página lo define colegio-ui.js; carta por defecto)
+   --------------------------------------------------------------------------- */
+@media print {
+  .cu-barra, .cu-no-imprimir, .cu-mensaje--alerta, .cu-cargando { display: none !important; }
+  .cu-zoom { zoom: 1 !important; }
+  .cu-pagina { padding: 0; }
+  body.cu { font-size: 11px; }
+  .cu-titulo { font-size: 18px; }
+  .cu-grupo > h2 { break-after: avoid; }
+  .cu-tabla tr { break-inside: avoid; }
+  .cu-tabla thead { display: table-header-group; }
+  .cu-tabla tbody tr:hover td { background: none; }
+  .cu-tabla th button.cu-orden { border-bottom: 0; color: var(--cu-suave); }
+  .cu-tabla th, .cu-insignia, .cu-grupo > h2 {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.cu * { transition: none !important; animation: none !important; }
+}
