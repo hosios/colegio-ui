@@ -1,5 +1,5 @@
 /* ============================================================================
-   COLEGIO-UI 1.0.0 — Biblioteca compartida de los widgets de Grist
+   COLEGIO-UI 1.1.0 — Biblioteca compartida de los widgets de Grist
    ----------------------------------------------------------------------------
    Uso básico:
      const ui = ColegioUI.iniciar({
@@ -19,7 +19,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "1.0.0";
+  const VERSION = "1.1.0";
 
   /* ==========================================================================
      UTILIDADES
@@ -59,6 +59,9 @@
     return m ? Number(m[1]) : 0;
   };
 
+  /** Indica si una referencia está vacía (Grist envía 0 para una referencia vacía). */
+  util.sinRef = v => util.idRef(v) === 0;
+
   /** Convierte datos por columnas (fetchTable) en una lista de filas. */
   util.filas = datos => {
     const claves = Object.keys(datos || {});
@@ -87,6 +90,12 @@
     return new Date(ms).toLocaleDateString("es-PY", Object.assign(
       { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }, opciones || {}));
   };
+
+  /**
+   * Fecha de hoy en la hora local del equipo (no en UTC).
+   * util.hoy() → "19/11/2026"; util.hoy({ day: "numeric", month: "long", year: "numeric" }) → "19 de noviembre de 2026"
+   */
+  util.hoy = opciones => new Date().toLocaleDateString("es-PY", opciones || undefined);
 
   /** Número con separador de miles (cédulas: 7.719.076). */
   util.cedula = v => (v === null || v === undefined || v === "" || isNaN(Number(v)))
@@ -298,14 +307,18 @@
           set valor(v) { actual = String(v); marcar(); },
           opciones: dibujarOpciones,
           /** Oculta o muestra una opción (por ejemplo, «Docente» si no hay columna). */
-          ocultarOpcion(valor, ocultar = true) {
+          ocultarOpcion(valor, ocultar = true, { avisar: conAviso = true } = {}) {
             ocultar ? ocultas.add(String(valor)) : ocultas.delete(String(valor));
             const b = grupo.querySelector(`[data-valor="${CSS.escape(String(valor))}"]`);
             if (b) b.hidden = ocultar;
-            if (ocultar && String(actual) === String(valor)) {
-              actual = ops.find(o => !ocultas.has(o.valor))?.valor;
-            }
+            const cambia = ocultar && String(actual) === String(valor);
+            if (cambia) actual = ops.find(o => !ocultas.has(o.valor))?.valor;
             marcar();
+            // Si se ocultó la opción activa, se guarda el nuevo valor y se avisa al widget
+            if (cambia) {
+              if (claveMem) guardarPref(claveMem, actual);
+              if (conAviso && typeof def.alCambiar === "function") def.alCambiar(actual);
+            }
           }
         };
         break;
@@ -323,6 +336,23 @@
         console.warn(`ColegioUI: tipo de filtro desconocido «${def.tipo}».`);
         return null;
     }
+
+    // El valor asignado desde el código también se recuerda (recordar: true)
+    const desc = Object.getOwnPropertyDescriptor(control, "valor");
+    if (desc && desc.set) {
+      Object.defineProperty(control, "valor", {
+        enumerable: true, configurable: true,
+        get: desc.get,
+        set(v) { desc.set.call(control, v); if (claveMem) guardarPref(claveMem, desc.get.call(control)); }
+      });
+    }
+
+    /** Cambia el valor desde el código, lo guarda y, salvo { avisar: false }, llama a alCambiar. */
+    control.fijar = (v, { avisar: conAviso = true } = {}) => {
+      control.valor = v;
+      if (conAviso && typeof def.alCambiar === "function") def.alCambiar(control.valor);
+      return control.valor;
+    };
 
     control.mostrar = (visible = true) => { control.elemento.hidden = !visible; };
     if (def.oculto) control.mostrar(false);
@@ -419,6 +449,24 @@
     el.classList.toggle("cu-mensaje--alerta", tipo === "alerta");
     el.textContent = texto || "";
     el.hidden = !texto;
+  }
+
+  /* ==========================================================================
+     VERIFICACIÓN DE VERSIÓN
+     ColegioUI.requiere("1.1") comprueba que la versión cargada sea 1.x y al
+     menos 1.1. Si no lo es, muestra un aviso en pantalla y detiene el widget.
+     ========================================================================== */
+  function requiere(minima) {
+    const [maj, min = 0] = String(minima).split(".").map(Number);
+    const [vMaj, vMin] = VERSION.split(".").map(Number);
+    if (vMaj === maj && vMin >= min) return true;
+    const texto = `Este widget necesita colegio-ui ${maj}.${min} o posterior (versión ${maj}.x), ` +
+      `pero se cargó la versión ${VERSION}. Revise la dirección de la biblioteca en el HTML.`;
+    const aviso = crear("p", "cu-mensaje cu-mensaje--alerta");
+    aviso.style.margin = "12px";
+    aviso.textContent = texto;
+    document.body.insertBefore(aviso, document.body.firstChild);
+    throw new Error("ColegioUI: " + texto);
   }
 
   /* ==========================================================================
@@ -533,5 +581,5 @@
   /* ==========================================================================
      EXPORTACIÓN
      ========================================================================== */
-  global.ColegioUI = { version: VERSION, iniciar, util, cargando, mensaje, preferencia: { leer: leerPref, guardar: guardarPref } };
+  global.ColegioUI = { version: VERSION, iniciar, requiere, util, cargando, mensaje, preferencia: { leer: leerPref, guardar: guardarPref } };
 })(window);
