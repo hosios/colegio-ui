@@ -89,7 +89,7 @@ ui.filtros.sinPadres.mostrar(!!mapeo.TipoCarga);
 | `esc(texto)` | Escapa texto para HTML |
 | `coll`, `comparar(a, b)` | Orden alfabético en español con números naturales |
 | `texto(v)`, `vacio(v)`, `numOrden(v)` | Lectura de valores de Grist |
-| `idRef(v)`, `sinRef(v)` | Id de una referencia en cualquier formato; `sinRef` indica si está vacía (0, nula o vacía) |
+| `idRef(v)`, `sinRef(v)` | Id de una referencia en cualquier formato; `sinRef` indica si está vacía (0, nula, vacía o lista sin elementos). Un texto que no es un id, como la columna a mostrar, cuenta como referencia con valor |
 | `filas(datos)`, `leerTabla(nombre)` | Datos por columnas → lista de filas |
 | `fecha(v)`, `cedula(v)`, `numero(v, decimales)` | Formatos locales (`fecha` usa UTC: sirve para fechas guardadas, como nacimientos) |
 | `hoy(opciones)` | Fecha de hoy en la hora local: «19/11/2026», o «19 de noviembre de 2026» con `{ day: "numeric", month: "long", year: "numeric" }` |
@@ -122,6 +122,7 @@ Variables principales: `--cu-tinta`, `--cu-suave`, `--cu-linea`, `--cu-banda`, `
 
 ## Historial
 
+- **1.1.1**: `sinRef` reconoce la columna a mostrar (texto) como referencia con valor y acepta listas de referencias.
 - **1.1.0**: `fijar()` en los filtros; el setter `valor` guarda la preferencia; `ocultarOpcion` avisa el cambio; `util.hoy()`, `util.sinRef()` y `ColegioUI.requiere()`.
 - **1.0.0**: versión inicial.
 
